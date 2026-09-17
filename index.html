@@ -108,16 +108,32 @@
 </head>
 <body class="text-gray-800">
     <!-- Hero Section -->
-    <header class="py-16 md:py-24 px-6 text-center bg-white relative overflow-hidden">
+    <header class="py-12 md:py-16 px-6 text-center bg-white relative overflow-hidden">
         <div class="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
             <svg width="100%" height="100%"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid)" /></svg>
         </div>
-        <!-- Logo Section - ขยายขนาดให้ใกล้เคียงกับความกว้างของชื่อแบรนด์ -->
-        <div class="mb-6 relative z-10 animate-fade-in-up">
-            <img src="https://i.ibb.co/FLX32bKg/3.png" alt="Web Card Service Logo" class="w-64 h-64 md:w-80 md:h-80 mx-auto drop-shadow-sm object-contain">
+        
+        <!-- Logo Section -->
+        <div class="mb-4 relative z-10 animate-fade-in-up">
+            <img src="https://i.ibb.co/FLX32bKg/3.png" alt="Web Card Service Logo" class="w-56 h-56 md:w-72 md:h-72 mx-auto drop-shadow-sm object-contain">
         </div>
-        <h1 class="text-4xl md:text-6xl font-mitr font-bold text-pink-500 mb-4 tracking-tight relative z-10 animate-fade-in-up delay-100">Web Card Service</h1>
-        <p class="text-xl text-gray-500 font-light max-w-2xl mx-auto relative z-10 animate-fade-in-up delay-200">สร้างความทรงจำสุดพิเศษ ผ่านหน้าเว็บไซต์ส่วนตัวที่ออกแบบมาเพื่อคุณโดยเฉพาะ</p>
+        <h1 class="text-4xl md:text-6xl font-mitr font-bold text-pink-500 mb-3 tracking-tight relative z-10 animate-fade-in-up delay-100">Web Card Service</h1>
+        <p class="text-lg md:text-xl text-gray-500 font-light max-w-2xl mx-auto relative z-10 animate-fade-in-up delay-200">สร้างความทรงจำสุดพิเศษ ผ่านหน้าเว็บไซต์ส่วนตัวที่ออกแบบมาเพื่อคุณโดยเฉพาะ</p>
+        
+        <!-- ย้ายส่วน Live Queue ขึ้นมาอยู่ตรงนี้ -->
+        <div class="mt-8 relative z-10 animate-fade-in-up delay-300 max-w-md mx-auto">
+            <div class="bg-white/90 border border-pink-100 rounded-3xl p-5 shadow-[0_8px_30px_rgba(244,63,94,0.08)] backdrop-blur-sm text-left">
+                <h3 class="text-base md:text-lg font-mitr font-medium text-gray-800 mb-3 flex items-center justify-center">
+                    <span class="relative flex h-3 w-3 mr-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                    สถานะคิวปัจจุบัน (Live Queue)
+                </h3>
+                <div id="loading-queue" class="text-gray-400 text-xs italic py-2 text-center">กำลังโหลดข้อมูลคิว...</div>
+                <div id="queue-list" class="space-y-2.5 max-h-60 overflow-y-auto pr-1"></div>
+            </div>
+        </div>
     </header>
 
     <div class="section-divider"></div>
@@ -209,7 +225,7 @@
                         <div class="group p-6 bg-gray-50/50 rounded-3xl border border-gray-100 transition-all hover:bg-white hover:shadow-md">
                             <h4 class="font-bold text-blue-600 text-lg mb-1">คิวปกติ</h4>
                             <p class="text-gray-600 text-sm">รอรับงานภายใน 3-5 วัน</p>
-                            <p class="text-[11px] text-gray-400 mt-2 leading-relaxed font-light italic">*เร็วสุด 3 วันช้าสุด 5 วัน หรืออาจจะเร็กว่านั้นขึ้นอยู่กับคิวงาน</p>
+                            <p class="text-[11px] text-gray-400 mt-2 leading-relaxed font-light italic">*เร็วสุด 3 วันช้าสุด 5 วัน หรืออาจจะเร็วกว่านั้นขึ้นอยู่กับคิวงาน</p>
                         </div>
                         <div class="group p-6 bg-red-50/30 rounded-3xl border border-red-50 transition-all hover:bg-white hover:shadow-md">
                             <div class="flex items-center justify-between mb-2">
@@ -257,5 +273,102 @@
     <footer class="text-center py-12 text-gray-400 text-sm border-t border-gray-50">
         <p class="font-light">© 2024 <span class="font-medium text-pink-400">Web Card Service</span>. All Rights Reserved.</p>
     </footer>
+
+    <!-- Firebase Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJS_KFCJIb5zrf5wnr8FWSusIqyY_dVXU",
+            authDomain: "web-card-queue.firebaseapp.com",
+            projectId: "web-card-queue",
+            storageBucket: "web-card-queue.firebasestorage.app",
+            messagingSenderId: "684068109476",
+            appId: "1:684068109476:web:532fe76211d3122412fa31",
+            measurementId: "G-7LQX2BBZT9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const queueListEl = document.getElementById('queue-list');
+        const loadingEl = document.getElementById('loading-queue');
+
+        function getPackageBadgeStyle(pkg) {
+            const pkgName = (pkg || '').toString().toLowerCase();
+            if (pkgName.includes('premium')) return 'bg-pink-100 text-pink-600 border-pink-200';
+            if (pkgName.includes('standard')) return 'bg-blue-100 text-blue-600 border-blue-200';
+            if (pkgName.includes('lite')) return 'bg-green-100 text-green-600 border-green-200';
+            return 'bg-gray-100 text-gray-600 border-gray-200';
+        }
+
+        function getStatusBadgeStyle(status) {
+            const st = (status || '').toString().toLowerCase();
+            if (st === 'waiting') return 'bg-amber-50 text-amber-600 border-amber-200';
+            if (st === 'processing') return 'bg-blue-50 text-blue-600 border-blue-200';
+            if (st === 'completed') return 'bg-emerald-50 text-emerald-600 border-emerald-200';
+            return 'bg-gray-50 text-gray-600 border-gray-200';
+        }
+
+        // ดึงเฉพาะ Document 'current_queue'
+        const queueDocRef = doc(db, "queues", "current_queue");
+
+        onSnapshot(queueDocRef, (docSnap) => {
+            loadingEl.style.display = 'none';
+            queueListEl.innerHTML = '';
+
+            if (!docSnap.exists()) {
+                queueListEl.innerHTML = `
+                    <div class="text-gray-400 text-xs text-center py-4 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
+                        ยังไม่มีรายการคิวในขณะนี้
+                    </div>`;
+                return;
+            }
+
+            const q = docSnap.data();
+            const queueId = q.queueId || 'Q001';
+            const packageTitle = q.package || 'Standard Set';
+            const status = q.status || 'waiting';
+            const statusText = q.statusText || 'รอดำเนินการ';
+            const isExpress = q.isExpress === true;
+
+            const pkgBadgeClass = getPackageBadgeStyle(packageTitle);
+            const statusBadgeClass = getStatusBadgeStyle(status);
+
+            const queueTypeBadge = isExpress 
+                ? `<span class="bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full animate-pulse ml-1">⚡ คิวพิเศษ (Express)</span>`
+                : `<span class="bg-gray-100 text-gray-500 text-[9px] font-medium px-1.5 py-0.5 rounded-full ml-1">คิวปกติ</span>`;
+
+            const cardHtml = `
+                <div class="flex items-center justify-between p-3 bg-white border ${isExpress ? 'border-red-200 bg-red-50/10' : 'border-gray-100'} shadow-sm rounded-2xl transition-all hover:border-pink-200 hover:shadow-md mb-2">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl ${isExpress ? 'bg-red-100 text-red-500' : 'bg-pink-50 text-pink-500'} font-bold flex items-center justify-center text-xs shadow-inner flex-shrink-0">
+                            ${queueId}
+                        </div>
+                        <div>
+                            <div class="flex items-center mb-0.5">
+                                <p class="font-bold text-gray-800 text-sm leading-snug">${packageTitle}</p>
+                                ${queueTypeBadge}
+                            </div>
+                            <span class="inline-block px-2 py-0.5 text-[10px] font-medium border rounded-md ${pkgBadgeClass}">
+                                ${packageTitle}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <span class="inline-flex items-center px-2.5 py-1 border rounded-full text-[11px] font-semibold ${statusBadgeClass}">
+                            ${statusText}
+                        </span>
+                    </div>
+                </div>
+            `;
+            queueListEl.innerHTML = cardHtml;
+        }, (error) => {
+            console.error("Error loading queue:", error);
+            loadingEl.textContent = '❌ ไม่สามารถเชื่อมต่อฐานข้อมูลคิวได้';
+            loadingEl.className = 'text-red-500 text-xs italic py-2 text-center';
+        });
+    </script>
 </body>
 </html>
